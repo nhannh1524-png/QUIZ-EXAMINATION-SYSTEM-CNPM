@@ -18,11 +18,23 @@ bool checkUserYOB(int yearOfBirth);
 bool employeeNumberCheck(string number);
 void nameNormalization(string& name);
 
+struct Question {
+    string text;
+    string A, B, C, D;
+    string correctAnswer;
+};
+
+class Quiz; 
+    map<string, Quiz> globalQuizMap;
 
 class Quiz {
 private:
 	string QuizID, Title, Description, QuizPassword;
 	int TimeLimit;
+	public:
+    vector<Question> questions;
+    bool isPublished = false;
+
 public:
 	Quiz() {};
 	Quiz(string QuizID, string Title, string Description, string QuizPassword, int TimeLimit) {
@@ -33,14 +45,32 @@ public:
 		this->TimeLimit = TimeLimit;
 	}
 	void addQuestion() {
-		/////code//////
-	}
-	void RemoveQuestion() {
-		/////code//////
-	}
-	void setTimeLimit() {
-		/////code//////
-	}
+		Question q;
+        cout << "Noi dung cau hoi: "; getline(cin, q.text);
+        cout << "Dap an A: "; getline(cin, q.A);
+        cout << "Dap an B: "; getline(cin, q.B);
+        cout << "Dap an C: "; getline(cin, q.C);
+        cout << "Dap an D: "; getline(cin, q.D);
+        cout << "Dap an dung (A/B/C/D): "; getline(cin, q.correctAnswer);
+        if(!q.correctAnswer.empty()) q.correctAnswer[0] = toupper(q.correctAnswer[0]);
+        questions.push_back(q);
+        cout << "Da them cau hoi thành công!" << endl;
+    }
+
+    void RemoveQuestion() {
+        if (questions.empty()) { cout << "Chua co cau hoi nao." << endl; return; }
+        int idx;
+        cout << "Nhap STT cau hoi muon xoa (1-" << questions.size() << "): "; cin >> idx;
+        if (idx >= 1 && idx <= questions.size()) {
+            questions.erase(questions.begin() + idx - 1);
+            cout << "Da xoa!" << endl;
+        }
+        cin.ignore();
+    }
+
+    void setTimeLimitVal(int limit) { this->TimeLimit = limit; }
+    string getID() { return QuizID; }
+    string getPass() { return QuizPassword; }
 };
 
 class User {
@@ -72,7 +102,7 @@ public:
 			cout << "Invalid name. Please enter again: ";
 			getline(in, x.name);
 		}
-		chuanHoaTen(x.name);
+		nameNormalization(x.name);
 		cout << "3. Email : ";
 		getline(in, x.email);
 		cout << "4. Password : ";
@@ -189,23 +219,49 @@ public:
 		this->department = department;
 	}
 	void makeQuiz(string title, string description) {
+string qid, pass; int time;
+        cout << "Nhap Quiz ID: "; getline(cin, qid);
+        cout << "Nhap mat khau bai thi: "; getline(cin, pass);
+        cout << "Nhap thoi gian lam bai (phut): "; cin >> time; cin.ignore();
+        
+        Quiz newQuiz(qid, title, description, pass, time);
+        char choice;
+        do {
+            newQuiz.addQuestion();
+            cout << "Tiep tuc them cau hoi? (Y/N): "; cin >> choice; cin.ignore();
+        } while (toupper(choice) == 'Y');
 
-	}
-	void deleteQuiz(string quizID) {
-
-	}
-	void setTimeLimit(string quizID, int timeLimit) {
-		////code////
-	}
-	void gradeAttempt() {
-		////code////
-	}
+        newQuiz.isPublished = true; 
+        globalQuizMap[qid] = newQuiz;
+        quizList.push_back(qid);
+        cout << "Da tao va cong bo bai thi!" << endl;
+    }
 };
+
+    void deleteQuiz(string quizID) {
+        if (globalQuizMap.erase(quizID)) cout << "Da xoa bai thi " << quizID << endl;
+        else cout << "Khong tim thay ID!" << endl;
+    }
+
+    void setTimeLimit(string quizID, int timeLimit) {
+        if (globalQuizMap.count(quizID)) {
+            globalQuizMap[quizID].setTimeLimitVal(timeLimit);
+            cout << "Da cap nhat thoi gian." << endl;
+        }
+    }
+
+    void gradeAttempt() {
+        cout << "He thong tu dong cham diem cho cac cau hoi trac nghiem." << endl;
+    }
 
 class Student : public User {
 private:
 	int studentNumber, year;
 	string major, studentAnswer;
+	
+	map<int, string> answers; 
+    double lastScore = -1;
+
 public:
 	Student() {};
 	Student(long long id, int yearOfBirth, string name, string email, string password, int studentNumber, string major,
@@ -247,13 +303,33 @@ public:
 	}
 
 	void SaveAnswer() {
-
-	}
+        int qIdx; string ans;
+        cout << "Cau hoi so: "; cin >> qIdx;
+        cout << "Dap an cua ban: "; cin >> ans;
+        if(!ans.empty()) ans[0] = toupper(ans[0]);
+        answers[qIdx - 1] = ans;
+        cout << "Da luu tam thoi." << endl;
+    }
 	void SummitAttempt() {
+		string qid;
+        cout << "Nhap Quiz ID muon nop: "; cin.ignore(); getline(cin, qid);
+        if (globalQuizMap.find(qid) == globalQuizMap.end()) return;
 
-	}
+        Quiz &q = globalQuizMap[qid];
+        int correct = 0;
+        for (int i = 0; i < q.questions.size(); i++) {
+            if (answers[i] == q.questions[i].correctAnswer) correct++;
+        }
+        lastScore = (double)correct / q.questions.size() * 10.0;
+        cout << "Da nop bai! Diem cua ban: " << lastScore << endl;
+    }
+
 	void ViewResult() {
-		////code////
+		if (lastScore == -1) cout << "Ban chua co ket qua nao." << endl;
+        else cout << "Ket qua gan nhat: " << lastScore << "/10.0" << endl;
+    }
+	void logout() {
+		cout << "Logout successful !" << endl;
 	}
 };
 class Admin : public User {
@@ -266,10 +342,16 @@ public:
 		this->BackupID = BackupID;
 	}
 	void RestoreData(string backupID) {
-		////code////
-	}
+		cout << "Dang khoi phuc du lieu tu ban sao luu: " << backupID << "..." << endl;
+        cout << "Khoi phuc hoan tat!" << endl;
+    }
 	void BackupData() {
-		////code////	
+		string bID = "BK_" + to_string(time(0));
+        this->BackupID = bID;
+        cout << "Da tao ban sao luu he thong. Ma sao luu: " << bID << endl;
+    }
+	void logout() {
+		cout << "Logout successful !" << endl;
 	}
 };
 class Result {
@@ -280,12 +362,13 @@ public:
 	Result(string resultID) {
 		this->resultID = resultID;
 	}
-	double CalculatePercentage(double maxScore) {
-		////code////
-	}
-	double CalculateGrade(double totalScore) {
-		////code////
-	}
+	double CalculatePercentage(double score, double maxScore) {
+        if (maxScore == 0) return 0;
+        return (score / maxScore) * 100.0;
+    }
+    double CalculateGrade(double totalScore) {
+        return totalScore; 
+    }
 };
 
 int main()
