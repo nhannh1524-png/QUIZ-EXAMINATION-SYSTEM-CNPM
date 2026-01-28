@@ -435,16 +435,14 @@ int main()
 		else if (TeacherAccountData.find(email) != TeacherAccountData.end() && TeacherAccountData[email] == password
 			&& StudentAccountData.find(email) == StudentAccountData.end()) {
 			cout << "Login Successfully ! " << endl;
-		}
-		else {
+		}	
+	}
+	else {
 			cout << "\nAccount does not exist or incorrect email/password!" << endl;
 			cout << "Press Enter to continue...";
 			cin.get();
 		}
-	}
 }
-
-
 
 void dateOfBirthNormalization(string& birth) {
 	if (birth[0] == '/') {
