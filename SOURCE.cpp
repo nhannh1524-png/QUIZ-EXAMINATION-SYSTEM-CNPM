@@ -401,13 +401,21 @@ int main()
 		Teacher teacher;
 		cin >> teacher;
 		TeacherAccountData.insert({ teacher.getEmail(), teacher.getPassword() });
+		cout << "\n=== Registration Successful ===" << endl;
 		teacher.printInformation();
+		cout << "\nPress Enter to continue to login...";
+		cin.ignore();
+		cin.get();
 	}
 	else if (ch == "S" || ch == "s") {
 		Student student;
 		cin >> student;
 		StudentAccountData.insert({ student.getEmail(), student.getPassword() });
+		cout << "\n=== Registration Successful ===" << endl;
 		student.printInformation();
+		cout << "\nPress Enter to continue to login...";
+		cin.ignore();
+		cin.get();
 	}
 	else {
 		cout << "Exit successfully !" << endl;
