@@ -438,10 +438,10 @@ int main()
 		}	
 	}
 	else {
-			cout << "\nAccount does not exist or incorrect email/password!" << endl;
-			cout << "Press Enter to continue...";
-			cin.get();
-		}
+		cout << "\nAccount does not exist or incorrect email/password!" << endl;
+		cout << "Press Enter to continue...";
+		cin.get();
+	}
 }
 
 void dateOfBirthNormalization(string& birth) {
