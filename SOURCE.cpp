@@ -388,9 +388,6 @@ int main()
 	cout << "5.Year Of Birth : " << endl;
 	cout << "6.Select T to register as a Teacher " << endl;
 	cout << "  Select S to register as a Student " << endl;
-	cout << "  Press ""1"" to confirm information and log in " << endl;
-	cout << "  Press ""2"" to log in" << endl;
-	cout << "  Press ""3"" to exit " << endl;
 	cout << "================================================" << endl;
 	cout << endl;
 	string ch;
