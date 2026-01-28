@@ -403,9 +403,6 @@ int main()
 		TeacherAccountData.insert({ teacher.getEmail(), teacher.getPassword() });
 		cout << "\n=== Registration Successful ===" << endl;
 		teacher.printInformation();
-		cout << "\nPress Enter to continue to login...";
-		cin.ignore();
-		cin.get();
 	}
 	else if (ch == "S" || ch == "s") {
 		Student student;
@@ -413,9 +410,6 @@ int main()
 		StudentAccountData.insert({ student.getEmail(), student.getPassword() });
 		cout << "\n=== Registration Successful ===" << endl;
 		student.printInformation();
-		cout << "\nPress Enter to continue to login...";
-		cin.ignore();
-		cin.get();
 	}
 	else {
 		cout << "Exit successfully !" << endl;
@@ -441,6 +435,11 @@ int main()
 		else if (TeacherAccountData.find(email) != TeacherAccountData.end() && TeacherAccountData[email] == password
 			&& StudentAccountData.find(email) == StudentAccountData.end()) {
 			cout << "Login Successfully ! " << endl;
+		}
+		else {
+			cout << "\nAccount does not exist or incorrect email/password!" << endl;
+			cout << "Press Enter to continue...";
+			cin.get();
 		}
 	}
 }
