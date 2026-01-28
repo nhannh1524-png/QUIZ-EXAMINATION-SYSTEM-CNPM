@@ -45,28 +45,33 @@ public:
 		this->TimeLimit = TimeLimit;
 	}
 	void addQuestion() {
-		Question q;
-        cout << "Noi dung cau hoi: "; getline(cin, q.text);
-        cout << "Dap an A: "; getline(cin, q.A);
-        cout << "Dap an B: "; getline(cin, q.B);
-        cout << "Dap an C: "; getline(cin, q.C);
-        cout << "Dap an D: "; getline(cin, q.D);
-        cout << "Dap an dung (A/B/C/D): "; getline(cin, q.correctAnswer);
-        if(!q.correctAnswer.empty()) q.correctAnswer[0] = toupper(q.correctAnswer[0]);
-        questions.push_back(q);
-        cout << "Da them cau hoi thành công!" << endl;
-    }
+    Question q;
+    cout << "Question content: "; getline(cin, q.text);
+    cout << "Answer A: "; getline(cin, q.A);
+    cout << "Answer B: "; getline(cin, q.B);
+    cout << "Answer C: "; getline(cin, q.C);
+    cout << "Answer D: "; getline(cin, q.D);
+    cout << "Correct answer (A/B/C/D): "; getline(cin, q.correctAnswer);
+    if (!q.correctAnswer.empty()) q.correctAnswer[0] = toupper(q.correctAnswer[0]);
+    questions.push_back(q);
+    cout << "Question added successfully!" << endl;
+}
 
-    void RemoveQuestion() {
-        if (questions.empty()) { cout << "Chua co cau hoi nao." << endl; return; }
-        int idx;
-        cout << "Nhap STT cau hoi muon xoa (1-" << questions.size() << "): "; cin >> idx;
-        if (idx >= 1 && idx <= questions.size()) {
-            questions.erase(questions.begin() + idx - 1);
-            cout << "Da xoa!" << endl;
-        }
-        cin.ignore();
+void RemoveQuestion() {
+    if (questions.empty()) {
+        cout << "There are no questions yet." << endl;
+        return;
     }
+    int idx;
+    cout << "Enter the question number to delete (1-" << questions.size() << "): ";
+    cin >> idx;
+    if (idx >= 1 && idx <= questions.size()) {
+        questions.erase(questions.begin() + idx - 1);
+        cout << "Deleted successfully!" << endl;
+    }
+    cin.ignore();
+}
+
 
     void setTimeLimitVal(int limit) { this->TimeLimit = limit; }
     string getID() { return QuizID; }
@@ -219,39 +224,39 @@ public:
 		this->department = department;
 	}
 	void makeQuiz(string title, string description) {
-string qid, pass; int time;
-        cout << "Nhap Quiz ID: "; getline(cin, qid);
-        cout << "Nhap mat khau bai thi: "; getline(cin, pass);
-        cout << "Nhap thoi gian lam bai (phut): "; cin >> time; cin.ignore();
+        string qid, pass; int time;
+        cout << "Enter Quiz ID: "; getline(cin, qid);
+        cout << "Enter quiz password: "; getline(cin, pass);
+        cout << "Enter time limit (minutes): "; cin >> time; cin.ignore();
         
         Quiz newQuiz(qid, title, description, pass, time);
         char choice;
         do {
             newQuiz.addQuestion();
-            cout << "Tiep tuc them cau hoi? (Y/N): "; cin >> choice; cin.ignore();
+            cout << "Continue adding questions? (Y/N): "; cin >> choice; cin.ignore();
         } while (toupper(choice) == 'Y');
 
         newQuiz.isPublished = true; 
         globalQuizMap[qid] = newQuiz;
         quizList.push_back(qid);
-        cout << "Da tao va cong bo bai thi!" << endl;
+        cout << "Quiz created and published!" << endl;
     }
 };
 
     void deleteQuiz(string quizID) {
-        if (globalQuizMap.erase(quizID)) cout << "Da xoa bai thi " << quizID << endl;
-        else cout << "Khong tim thay ID!" << endl;
+        if (globalQuizMap.erase(quizID)) cout << "Deleted quiz " << quizID << endl;
+        else cout << "ID not found!" << endl;
     }
 
     void setTimeLimit(string quizID, int timeLimit) {
         if (globalQuizMap.count(quizID)) {
             globalQuizMap[quizID].setTimeLimitVal(timeLimit);
-            cout << "Da cap nhat thoi gian." << endl;
+            cout << "Time limit updated." << endl;
         }
     }
 
     void gradeAttempt() {
-        cout << "He thong tu dong cham diem cho cac cau hoi trac nghiem." << endl;
+        cout << "System automatically grades multiple-choice questions." << endl;
     }
 
 class Student : public User {
@@ -304,15 +309,16 @@ public:
 
 	void SaveAnswer() {
         int qIdx; string ans;
-        cout << "Cau hoi so: "; cin >> qIdx;
-        cout << "Dap an cua ban: "; cin >> ans;
+        cout << "Question number: "; cin >> qIdx;
+        cout << "Your answer: "; cin >> ans;
         if(!ans.empty()) ans[0] = toupper(ans[0]);
         answers[qIdx - 1] = ans;
-        cout << "Da luu tam thoi." << endl;
+        cout << "Saved temporarily." << endl;
     }
-	void SummitAttempt() {
-		string qid;
-        cout << "Nhap Quiz ID muon nop: "; cin.ignore(); getline(cin, qid);
+
+    void SummitAttempt() {
+        string qid;
+        cout << "Enter Quiz ID to submit: "; cin.ignore(); getline(cin, qid);
         if (globalQuizMap.find(qid) == globalQuizMap.end()) return;
 
         Quiz &q = globalQuizMap[qid];
@@ -321,16 +327,13 @@ public:
             if (answers[i] == q.questions[i].correctAnswer) correct++;
         }
         lastScore = (double)correct / q.questions.size() * 10.0;
-        cout << "Da nop bai! Diem cua ban: " << lastScore << endl;
+        cout << "Submitted! Your score: " << lastScore << endl;
     }
 
-	void ViewResult() {
-		if (lastScore == -1) cout << "Ban chua co ket qua nao." << endl;
-        else cout << "Ket qua gan nhat: " << lastScore << "/10.0" << endl;
+    void ViewResult() {
+        if (lastScore == -1) cout << "You have no results yet." << endl;
+        else cout << "Latest result: " << lastScore << "/10.0" << endl;
     }
-	void logout() {
-		cout << "Logout successful !" << endl;
-	}
 };
 class Admin : public User {
 private:
@@ -342,13 +345,13 @@ public:
 		this->BackupID = BackupID;
 	}
 	void RestoreData(string backupID) {
-		cout << "Dang khoi phuc du lieu tu ban sao luu: " << backupID << "..." << endl;
-        cout << "Khoi phuc hoan tat!" << endl;
+        cout << "Restoring data from backup: " << backupID << "..." << endl;
+        cout << "Restoration completed!" << endl;
     }
-	void BackupData() {
-		string bID = "BK_" + to_string(time(0));
+    void BackupData() {
+        string bID = "BK_" + to_string(time(0));
         this->BackupID = bID;
-        cout << "Da tao ban sao luu he thong. Ma sao luu: " << bID << endl;
+        cout << "System backup created. Backup ID: " << bID << endl;
     }
 	void logout() {
 		cout << "Logout successful !" << endl;
